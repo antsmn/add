@@ -1,0 +1,10 @@
+*.bak
+*.flist
+*.log
+*.vcd
+*.vvp
+.DS_Store
+TAGS
+flist
+netlist
+untracked
