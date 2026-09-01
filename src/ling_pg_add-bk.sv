@@ -1,13 +1,15 @@
 module pg_add #(
-    parameter W = 32
+  parameter W = 32
 ) (
-    input  logic [W-1:0] a_i,
-    input  logic [W-1:0] b_i,
-    input  logic         c_i,
-    output logic [W-1:0] s_o,
-    output logic         c_o
+  input  logic [W-1:0] a_i,
+  input  logic [W-1:0] b_i,
+  input  logic         c_i,
+  output logic [W-1:0] s_o,
+  output logic         c_o
 );
+
   localparam NS = $clog2(W);
+
   logic [W-1:0] p_0;
   logic [W-1:0] g_0;
   logic [W-1:0] t_0;

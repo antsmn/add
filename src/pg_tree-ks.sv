@@ -1,12 +1,13 @@
 module pg_tree #(
-    parameter W = 32,
-    parameter R = 2
+  parameter W = 32,
+  parameter R = 2
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
+
   localparam int NS = $ceil($ln(W) / $ln(R));
 
   logic [NS:0][W-1:0] p_0;

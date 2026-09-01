@@ -1,10 +1,10 @@
 module pg_tree #(
-    parameter W = 8
+  parameter W = 8
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
   always @(*) begin
     g_o = g_i;

@@ -1,78 +1,43 @@
 module carry_select_rca #(
-    parameter W = 16,
-    parameter K = 4
+  parameter int W = 16,
+  parameter int K = 4
 ) (
-    input  logic [W-1:0] a_i,
-    input  logic [W-1:0] b_i,
-    input  logic         c_i,
-    output logic [W-1:0] s_o,
-    output logic         c_o
+  input  logic [W-1:0] a_i,
+  input  logic [W-1:0] b_i,
+  input  logic         c_i,
+  output logic [W-1:0] s_o,
+  output logic         c_o
 );
-  // The conditional-sum adder is a logically redundant form of the Sklansky adder, taking two multiplexers to implement the same function as a black prefix cell
+  if (W == K) begin
 
-  localparam int NS = $clog2(W / K);
-  logic [ NS:0][W-1:0] c_0;
-  logic [ NS:0][W-1:0] s_0;
-  logic [ NS:0][W-1:0] s_1;
-  logic [ NS:0][W-1:0] c_1;
-  logic [W-1:0]        p_0;
-  logic [W-1:0]        g_0;
-  logic [W-1:0]        g_1;
-  logic [W-1:0]        g_2;
+    logic [W-1:0] p_0;
+    logic [W-1:0] g_0;
 
-  assign p_0 = a_i ^ b_i;
-  assign g_0 = a_i & b_i;
+    assign p_0 = a_i ^ b_i;
+    assign g_0 = a_i & b_i;
+    pg_rca #(.W(K)) i_pg_rca (.c_i(c_i), .p_i(p_0), .g_i(g_0), .s_o(s_o), .c_o(c_o));
 
-  for (genvar i = 2 * K - 1; i < W; i += K) begin
-    assign {c_0[0][i], g_1[i-:K]} = {g_0[i-:K] | (p_0[i-:K] & g_1[i-:K]), 1'b0};
-    assign {c_1[0][i], g_2[i-:K]} = {g_0[i-:K] | (p_0[i-:K] & g_2[i-:K]), 1'b1};
+  end else begin
+
+    localparam H = W / 2;
+
+    logic [1:0][H-1:0] a_0;
+    logic [1:0][H-1:0] b_0;
+    logic [1:0][H-1:0] s_0;
+    logic [1:0] c_0;
+    logic c_1;
+
+    assign a = a_i;
+    assign b = b_i;
+
+    carry_select_rca #(.W(H), .K(K)) i_carry_select_rca_0 (.c_i(c_i), .a_i(a[0]), .b_i(b[0]), .s_o(s_o[H-1:0]), .c_o(c_1));
+
+    carry_select_rca #(.W(H), .K(K)) i_carry_select_rca_1 (.c_i(1'b0), .a_i(a[1]), .b_i(b[1]), .s_o(s_0[0]), .c_o(c_0[0]));
+    carry_select_rca #(.W(H), .K(K)) i_carry_select_rca_2 (.c_i(1'b1), .a_i(a[1]), .b_i(b[1]), .s_o(s_0[1]), .c_o(c_0[1]));
+
+    // assign {c_o, s_o[H+:H]} = c_1 ? {c_0[1], s_0[1]} : {c_0[0], s_0[0]};
+    mux2 #(.W(1 + H)) i_mux2 (.s(c_1), .z({c_o, s_o[H+:H]}), .a({c_0[0], s_0[0]}), .b({c_0[1], s_0[1]}));
+
   end
-  assign {c_1[0][K-1], g_2[K-1:0]} = {g_0[K-1:0] | (p_0[K-1:0] & g_2[K-1:0]), c_i};
-
-  assign s_0[0] = p_0 ^ g_1;
-  assign s_1[0] = p_0 ^ g_2;
-
-  for (genvar i = 1; i < NS + 1; i += 1) begin
-    localparam P = K * (2 ** (i - 1));
-    localparam L = K * (2 ** (i));
-    for (genvar j = L - 1; j < W; j += L) begin
-      for (genvar k = j; k > j - P; k -= K) begin
-
-        if (k > L - 1) begin
-          MUX2_X1 i_MUX2 (
-              .Z(c_0[i][k]),
-              .S(c_0[i-1][j-P]),
-              .A(c_0[i-1][k]),
-              .B(c_1[i-1][k])
-          );
-          MUX2_X1_W #(K) i_MUX2_W (
-              .Z(s_0[i][k-:K]),
-              .S(c_0[i-1][j-P]),
-              .A(s_0[i-1][k-:K]),
-              .B(s_1[i-1][k-:K])
-          );
-        end
-
-        MUX2_X1 i_MUX2 (
-            .Z(c_1[i][k]),
-            .S(c_1[i-1][j-P]),
-            .A(c_0[i-1][k-:1]),
-            .B(c_1[i-1][k-:1])
-        );
-        MUX2_X1_W #(K) i_MUX2_W (
-            .Z(s_1[i][k-:K]),
-            .S(c_1[i-1][j-P]),
-            .A(s_0[i-1][k-:K]),
-            .B(s_1[i-1][k-:K])
-        );
-      end
-      assign s_1[i][j-P-:P] = s_1[i-1][j-P-:P];
-      assign c_1[i][j-P-:1] = c_1[i-1][j-P-:1];
-      assign s_0[i][j-P-:P] = s_0[i-1][j-P-:P];
-      assign c_0[i][j-P-:1] = c_0[i-1][j-P-:1];
-
-    end
-  end
-  assign {c_o, s_o} = {c_1[NS][W-1], s_1[NS]};
 
 endmodule

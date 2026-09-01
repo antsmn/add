@@ -1,11 +1,11 @@
 module carry_lookahead_add_16 (
-    input  logic [15:0] a_i,
-    input  logic [15:0] b_i,
-    input  logic        c_i,
-    output logic [15:0] s_o,
-    output logic        c_o,
-    output logic        p_o,
-    output logic        g_o
+  input  logic [15:0] a_i,
+  input  logic [15:0] b_i,
+  input  logic        c_i,
+  output logic [15:0] s_o,
+  output logic        c_o,
+  output logic        p_o,
+  output logic        g_o
 );
   logic [3:0] c_1;
   logic [3:0] p_1;
@@ -15,22 +15,22 @@ module carry_lookahead_add_16 (
 
   for (genvar i = 0; i < 4; i = i + 1) begin
     carry_lookahead_add i_carry_lookahead_add (
-        .a_i(a_i[4*i+:4]),
-        .b_i(b_i[4*i+:4]),
-        .c_i(c_1[i]),
-        .s_o(s_o[4*i+:4]),
-        .p_o(p_1[i]),
-        .g_o(g_1[i]),
-        .c_o()
+      .a_i(a_i[4*i+:4]),
+      .b_i(b_i[4*i+:4]),
+      .c_i(c_1[i]),
+      .s_o(s_o[4*i+:4]),
+      .p_o(p_1[i]),
+      .g_o(g_1[i]),
+      .c_o()
     );
   end
   carry_lookahead_gen i_carry_lookahead_gen (
-      .p_i(p_1),
-      .g_i(g_1),
-      .c_i(c_i),
-      .c_o(c_1[3:1]),
-      .p_o(p_2),
-      .g_o(g_2)
+    .p_i(p_1),
+    .g_i(g_1),
+    .c_i(c_i),
+    .c_o(c_1[3:1]),
+    .p_o(p_2),
+    .g_o(g_2)
   );
 
   assign c_1[0] = c_i;

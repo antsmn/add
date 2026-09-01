@@ -38,9 +38,13 @@ module pg_add #(
       end
     end
   end
-  assign s_o = p_0 ^ (h_1 & ((t_0 << 1) | 1'b1));
 
   assign c_o = g_0[W-1] | (t_0[W-1] & (h_1[W-1] & t_0[W-2]));
+
+  wire [W-1:0] a = t_0 << 1 | 1'b1;
+  wire [W-1:0] b = h_1 << 1 | c_i;
+
+  assign s_o = (h_1 & (p_0 ^ a)) | (~h_1 & p_0);
 
 
 endmodule

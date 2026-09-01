@@ -1,23 +1,23 @@
 module pg_tree #(
-    parameter W = 32,
-    parameter R = 2
+  parameter W = 32,
+  parameter R = 2
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
   if (W == 1) begin
     assign g_o = g_i;
     assign p_o = p_i;
   end else if (W == R) begin
     pg1 #(
-        .W(R)
+      .W(R)
     ) i_pg1 (
-        .p_i(p_i),
-        .g_i(g_i),
-        .p_o(p_o),
-        .g_o(g_o)
+      .p_i(p_i),
+      .g_i(g_i),
+      .p_o(p_o),
+      .g_o(g_o)
     );
 
   end else begin
@@ -41,20 +41,20 @@ module pg_tree #(
     assign hg = g_i[L+:H];
 
     pg_tree #(
-        .W(H)
+      .W(H)
     ) i_pg_tree_H (
-        .p_i(hp),
-        .g_i(hg),
-        .p_o(hp1),
-        .g_o(hg1)
+      .p_i(hp),
+      .g_i(hg),
+      .p_o(hp1),
+      .g_o(hg1)
     );
     pg_tree #(
-        .W(L)
+      .W(L)
     ) i_pg_tree_L (
-        .p_i(lp),
-        .g_i(lg),
-        .p_o(lp1),
-        .g_o(lg1)
+      .p_i(lp),
+      .g_i(lg),
+      .p_o(lp1),
+      .g_o(lg1)
     );
 
     logic [H-1:0] hg2;
@@ -70,12 +70,12 @@ module pg_tree #(
       logic go;
 
       pg #(
-          .W(2)
+        .W(2)
       ) i_pg (
-          .p_i(p),
-          .g_i(g),
-          .p_o(po),
-          .g_o(go)
+        .p_i(p),
+        .g_i(g),
+        .p_o(po),
+        .g_o(go)
       );
       assign hp2[i] = po;
       assign hg2[i] = go;

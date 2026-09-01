@@ -1,11 +1,11 @@
 module pg_add #(
-    parameter W = 32
+  parameter W = 32
 ) (
-    input  logic [W-1:0] a_i,
-    input  logic [W-1:0] b_i,
-    input  logic         c_i,
-    output logic [W-1:0] s_o,
-    output logic         c_o
+  input  logic [W-1:0] a_i,
+  input  logic [W-1:0] b_i,
+  input  logic         c_i,
+  output logic [W-1:0] s_o,
+  output logic         c_o
 );
   logic [W-1:0] p_0;
   logic [W-1:0] g_0;
@@ -22,39 +22,16 @@ module pg_add #(
   assign p_1 = p_0[W-5:0];
   assign g_1 = g_0[W-5:0];
 
-  pg_tree #(
-      .W(W - 4)
-  ) i_pg_tree
-  (
-      .p_i(p_1),
-      .g_i(g_1),
-      .g_o(g_2),
-      .p_o()
-  );
+  pg_tree #(.W(W - 4)) i_pg_tree (.p_i(p_1), .g_i(g_1), .g_o(g_2), .p_o());
+
   assign g_3 = g_2 << 1 | c_i;
 
   for (genvar i = 3; i < W; i += 4) begin
-    logic [3:0] p;
-    logic [3:0] g;
-    logic       c;
+
     logic [3:0] so;
     logic       co;
 
-    assign p = p_0[i-:4];
-    assign g = g_0[i-:4];
-    assign c = g_3[i-3];
-
-    pg_select #(
-        .W(4)
-    ) i_pg_select
-    (
-        .p_i(p),
-        .g_i(g),
-        .c_i(c),
-        .c_o(co),
-        .s_o(so)
-    );
-
+    pg_select #(.W(4)) i_pg_select (.p_i(p_0[i-:4]), .g_i(g_0[i-:4]), .c_i(g_3[i-3]), .c_o(co), .s_o(so));
     assign g_4[i] = co;
     assign s_o[i-:4] = so;
 

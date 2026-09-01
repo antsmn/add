@@ -1,14 +1,16 @@
-module MUX2_X1_W (A, B, S, Z);
+module mux2 (A, B, S, Z);
   parameter W = 1;
   input   [W-1:0] A;
   input   [W-1:0] B;
   input           S;
   output  [W-1:0] Z;
   genvar          i;
-  for (i = 0; i < W; i += 1) begin : w
+  for (i = 0; i < W; i += 1)
+  begin : w
     MUX2_X1 i_MUX_X1 (.A(A[i]), .B(B[i]), .S(S), .Z(Z[i]));
   end
 endmodule
+
 (*blackbox*)
 module MUX2_X1 (A, B, S, Z);
   input         A;

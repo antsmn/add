@@ -38,9 +38,14 @@ module pg_add #(
       end
     end
   end
-  assign s_o = p_0 ^ (h_1 & ((t_0 << 1) | 1'b1));
 
   assign c_o = g_0[W-1] | (t_0[W-1] & (h_1[W-1] & t_0[W-2]));
 
+  for (genvar i = 1; i < W; i += 1) begin
+
+    assign s_o[i] = (~h_1[i] & p_0[i]) | (h_1[i] & (t_0[i-1] ^ p_0[i]));
+
+  end
+  assign s_o[0] = p_0[0] ^ c_i;
 
 endmodule

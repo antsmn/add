@@ -1,12 +1,14 @@
 module pg_tree #(
-    parameter W = 32,
-    parameter R = 2
+  parameter W = 32,
+  parameter R = 2
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
+  // verilog_format: off
+
   localparam int NS = $ceil($ln(W) / $ln(R));
   localparam int NW = R ** NS;
 
@@ -32,6 +34,7 @@ module pg_tree #(
     begin : gen_pg
 
       pg_bk1 #(.W(K), .P(P), .R(R)) i_pg_bk1 (.p_i(p_0[i-1][k-:K]), .g_i(g_0[i-1][k-:K]), .p_o(p_0[i][k-:K]), .g_o(g_0[i][k-:K]));
+
     end
   end
   // carry reverse tree
@@ -59,21 +62,21 @@ module pg_tree #(
 endmodule
 
 module pg_bk1 #(
-    parameter W,
-    parameter R,
-    parameter P
+  parameter W,
+  parameter R,
+  parameter P
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
   // P = 1 degenerates to pg1: ext = p_i[W-1-:R] dep = p_o[W-1-:R]
   logic [R-1:0] p_1;
   logic [R-1:0] g_1;
   logic [R-1:0] p_2;
   logic [R-1:0] g_2;
-
+  // verilog_format: off
   pg1 #(.W(R)) i_pg1 (.p_i(p_1), .g_i(g_1), .p_o(p_2), .g_o(g_2));
 
   dep #(.W(W), .R(R), .P(P)) i_dep_p (.a_i(p_2), .p_i(p_i), .p_o(p_o));
@@ -84,15 +87,16 @@ module pg_bk1 #(
 endmodule
 
 module pg_bk2 #(
-    parameter W,
-    parameter R,
-    parameter P
+  parameter W,
+  parameter R,
+  parameter P
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
+
   logic [R-1:0] p_1;
   logic [R-1:0] g_1;
   logic [R-1:0] g_2;
@@ -100,6 +104,7 @@ module pg_bk2 #(
   pg2 #(.W(R)) i_pg2 (.p_i(p_1), .g_i(g_1), .g_o(g_2), .p_o());
 
   assign p_o = p_i;
+
   dep #(.W(W), .R(R), .P(P)) i_dep_g (.a_i(g_2), .p_i(g_i), .p_o(g_o));
   ext #(.W(W), .R(R), .P(P)) i_ext_p (.p_i(p_i), .p_o(p_1));
   ext #(.W(W), .R(R), .P(P)) i_ext_g (.p_i(g_i), .p_o(g_1));

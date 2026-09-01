@@ -1,11 +1,11 @@
 module pg_tree #(
-    parameter W = 32,
-    parameter R = 4
+  parameter W = 32,
+  parameter R = 4
 ) (
-    input  logic [W-1:0] p_i,
-    input  logic [W-1:0] g_i,
-    output logic [W-1:0] p_o,
-    output logic [W-1:0] g_o
+  input  logic [W-1:0] p_i,
+  input  logic [W-1:0] g_i,
+  output logic [W-1:0] p_o,
+  output logic [W-1:0] g_o
 );
 
   localparam int NS = $ceil($ln(W) / $ln(R));
@@ -27,7 +27,9 @@ module pg_tree #(
 
   for (k = R - 1; k < (W + R); k += R)
   begin : gen_bk
+
     pg1 #(.W(R)) i_pg1 (.p_i(p_0[0][k-:R]), .g_i(g_0[0][k-:R]), .p_o(p_0[1][k-:R]), .g_o(g_0[1][k-:R]));
+
   end
   for (i = 1; i < NS; i += 1)
   begin : gen_ks
@@ -59,7 +61,6 @@ module pg_tree #(
       assign g_0[i+1][k-:R] = {go, g_0[i][k-1-:(R-1)]};
 
     end
-
   end
 
   assign p_1[0] = p_0[NS];
